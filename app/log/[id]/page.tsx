@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useState } from "react";
+import { use, useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, Moon, Utensils, BookOpen, Activity, CheckCircle2, Circle, Save } from "lucide-react";
 import { users, historicalLogs, puasaStatusToOption } from "@/lib/mockData";
@@ -75,6 +75,19 @@ export default function LogPage({ params }: { params: Promise<{ id: string }> })
   const [olahraga, setOlahraga] = useState(editRecord?.olahraga ?? false);
   const [saved, setSaved] = useState(false);
 
+  useEffect(() => {
+    if (editRecord) {
+      setPuasa(puasaStatusToOption(editRecord.puasa));
+      setNgaji(editRecord.ngaji);
+      setOlahraga(editRecord.olahraga);
+    } else {
+      setPuasa("Puasa Penuh");
+      setNgaji(false);
+      setOlahraga(false);
+    }
+    setSaved(false);
+  }, [editDay]); // eslint-disable-line react-hooks/exhaustive-deps
+
   if (!user) {
     return (
       <main className="min-h-screen bg-green-50 flex items-center justify-center">
@@ -105,7 +118,7 @@ export default function LogPage({ params }: { params: Promise<{ id: string }> })
         <div className="max-w-md mx-auto flex items-center gap-3">
           <button
             onClick={() => router.back()}
-            aria-label="Kembali ke beranda"
+            aria-label={editDay ? "Kembali ke halaman sebelumnya" : "Kembali ke beranda"}
             className="p-2 rounded-xl hover:bg-emerald-600 active:bg-emerald-800 transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />
@@ -210,7 +223,7 @@ export default function LogPage({ params }: { params: Promise<{ id: string }> })
         {saved ? (
           <div className="flex items-center justify-center gap-3 bg-emerald-600 text-white rounded-2xl py-4 shadow-lg">
             <CheckCircle2 className="w-6 h-6 fill-white text-emerald-600" />
-            <span className="font-bold text-lg">Jurnal Tersimpan!</span>
+            <span className="font-bold text-lg">{editDay ? "Perubahan Tersimpan!" : "Jurnal Tersimpan!"}</span>
           </div>
         ) : (
           <button
