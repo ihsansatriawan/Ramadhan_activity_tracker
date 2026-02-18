@@ -42,12 +42,14 @@ export default function HomePage() {
               const badgeClass = rankColors[index] ?? rankColors[3];
 
               return (
-                <div
+                <Link
                   key={user.id}
-                  className={`flex items-center gap-4 p-4 rounded-2xl shadow-sm border transition-transform
+                  href={`/dashboard/${user.id}`}
+                  className={`flex items-center gap-4 p-4 rounded-2xl shadow-sm border transition-all duration-150
+                    hover:shadow-md hover:scale-[1.01] active:scale-[0.99]
                     ${isFirst
-                      ? "bg-yellow-50 border-yellow-300 shadow-yellow-100"
-                      : "bg-white border-green-100"
+                      ? "bg-yellow-50 border-yellow-300 shadow-yellow-100 hover:border-yellow-400"
+                      : "bg-white border-green-100 hover:border-emerald-300"
                     }`}
                 >
                   {/* Rank badge */}
@@ -83,7 +85,8 @@ export default function HomePage() {
                     </span>
                     <span className={`text-xs ${isFirst ? "text-yellow-500" : "text-emerald-400"}`}>pts</span>
                   </div>
-                </div>
+                  <ChevronRight className={`w-4 h-4 shrink-0 ${isFirst ? "text-yellow-400" : "text-emerald-300"}`} />
+                </Link>
               );
             })}
           </div>
