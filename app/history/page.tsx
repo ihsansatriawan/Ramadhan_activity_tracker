@@ -68,11 +68,16 @@ export default function HistoryPage() {
                     if (!rec) return <td key={user.id} />;
                     return (
                       <td key={user.id} className="py-3 px-3 text-center">
-                        <div className="flex items-center justify-center gap-1.5">
+                        <Link
+                          href={`/log/${user.id}?day=${log.day}`}
+                          className="flex items-center justify-center gap-1.5 rounded-lg p-1
+                                     hover:bg-emerald-50 transition-colors"
+                          aria-label={`Edit catatan ${user.name} Hari ${log.day}`}
+                        >
                           <span className={`w-3 h-3 rounded-full ${puasaDot[rec.puasa]}`} />
-                          {rec.ngaji && <BookOpen className="w-3.5 h-3.5 text-emerald-500" />}
-                          {rec.olahraga && <Activity className="w-3.5 h-3.5 text-blue-500" />}
-                        </div>
+                          {rec.ngaji && <BookOpen className="w-3.5 h-3.5 text-emerald-500" aria-hidden="true" />}
+                          {rec.olahraga && <Activity className="w-3.5 h-3.5 text-blue-500" aria-hidden="true" />}
+                        </Link>
                       </td>
                     );
                   })}
