@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { use, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Moon, Utensils, BookOpen, Activity, CheckCircle2, Circle, Save } from "lucide-react";
 import { users } from "@/lib/mockData";
@@ -54,9 +54,10 @@ function ToggleRow({ label, sublabel, icon, checked, onChange }: ToggleRowProps)
   );
 }
 
-export default function LogPage({ params }: { params: { id: string } }) {
+export default function LogPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   const router = useRouter();
-  const user = users.find((u) => u.id === params.id);
+  const user = users.find((u) => u.id === id);
 
   const [puasa, setPuasa] = useState<PuasaOption>("Puasa Penuh");
   const [ngaji, setNgaji] = useState(false);
@@ -81,9 +82,6 @@ export default function LogPage({ params }: { params: { id: string } }) {
 
   function handleSimpan() {
     // In Phase 1 we only show success feedback; no DB write
-    const log = { userId: user!.id, puasa, ngaji, olahraga };
-    console.log("Jurnal tersimpan (mock):", log);
-
     setSaved(true);
     setTimeout(() => {
       router.push("/");
