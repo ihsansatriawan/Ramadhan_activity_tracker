@@ -1,9 +1,9 @@
 "use client";
 
 import { use, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, Moon, Utensils, BookOpen, Activity, CheckCircle2, Circle, Save } from "lucide-react";
-import { users } from "@/lib/mockData";
+import { users, historicalLogs, puasaStatusToOption } from "@/lib/mockData";
 import type { PuasaOption } from "@/lib/mockData";
 
 const PUASA_OPTIONS: PuasaOption[] = ["Puasa Penuh", "Setengah Hari", "Tidak Puasa"];
@@ -59,9 +59,20 @@ export default function LogPage({ params }: { params: Promise<{ id: string }> })
   const router = useRouter();
   const user = users.find((u) => u.id === id);
 
-  const [puasa, setPuasa] = useState<PuasaOption>("Puasa Penuh");
-  const [ngaji, setNgaji] = useState(false);
-  const [olahraga, setOlahraga] = useState(false);
+  const searchParams = useSearchParams();
+  const dayParam = searchParams.get("day");
+  const editDay = dayParam ? Number(dayParam) : null;
+
+  // Look up historical record for edit mode
+  const editRecord = editDay
+    ? historicalLogs.find((l) => l.day === editDay)?.records[id]
+    : null;
+
+  const [puasa, setPuasa] = useState<PuasaOption>(
+    editRecord ? puasaStatusToOption(editRecord.puasa) : "Puasa Penuh"
+  );
+  const [ngaji, setNgaji] = useState(editRecord?.ngaji ?? false);
+  const [olahraga, setOlahraga] = useState(editRecord?.olahraga ?? false);
   const [saved, setSaved] = useState(false);
 
   if (!user) {
@@ -81,10 +92,9 @@ export default function LogPage({ params }: { params: Promise<{ id: string }> })
   }
 
   function handleSimpan() {
-    // In Phase 1 we only show success feedback; no DB write
     setSaved(true);
     setTimeout(() => {
-      router.push("/");
+      router.push(editDay ? `/dashboard/${id}` : "/");
     }, 1500);
   }
 
@@ -94,7 +104,7 @@ export default function LogPage({ params }: { params: Promise<{ id: string }> })
       <header className="bg-emerald-700 text-white py-5 px-4 shadow-lg">
         <div className="max-w-md mx-auto flex items-center gap-3">
           <button
-            onClick={() => router.push("/")}
+            onClick={() => router.back()}
             aria-label="Kembali ke beranda"
             className="p-2 rounded-xl hover:bg-emerald-600 active:bg-emerald-800 transition-colors"
           >
@@ -102,7 +112,9 @@ export default function LogPage({ params }: { params: Promise<{ id: string }> })
           </button>
           <Moon className="w-6 h-6 text-yellow-300 fill-yellow-300" />
           <div>
-            <h1 className="text-lg font-bold leading-tight">Jurnal Harian</h1>
+            <h1 className="text-lg font-bold leading-tight">
+              {editDay ? `Edit Hari ${editDay}` : "Jurnal Harian"}
+            </h1>
             <p className="text-emerald-200 text-sm">{user.name} {user.avatar}</p>
           </div>
         </div>
@@ -209,7 +221,7 @@ export default function LogPage({ params }: { params: Promise<{ id: string }> })
                        transition-all duration-150 active:scale-95"
           >
             <Save className="w-5 h-5" />
-            Simpan Jurnal
+            {editDay ? "Simpan Perubahan" : "Simpan Jurnal"}
           </button>
         )}
 
