@@ -2,7 +2,7 @@
 
 import { use } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Moon, BookOpen, Activity, Utensils, ChevronRight } from "lucide-react";
+import { ArrowLeft, Moon, BookOpen, Activity, Utensils, ChevronRight, Pencil } from "lucide-react";
 import { users, historicalLogs, getUserStats } from "@/lib/mockData";
 import type { PuasaStatus } from "@/lib/mockData";
 
@@ -105,9 +105,11 @@ export default function DashboardPage({ params }: { params: Promise<{ id: string
               const rec = log.records[id];
               if (!rec) return null;
               return (
-                <div
+                <button
                   key={log.day}
-                  className="flex items-center gap-3 bg-white border border-green-100 rounded-xl p-3 shadow-sm"
+                  onClick={() => router.push(`/log/${id}?day=${log.day}`)}
+                  className="w-full flex items-center gap-3 bg-white border border-green-100 rounded-xl p-3 shadow-sm
+                             hover:border-emerald-300 hover:bg-emerald-50/50 active:scale-[0.98] transition-all duration-150 text-left"
                 >
                   <div className="text-center shrink-0 w-12">
                     <p className="text-xs text-gray-400 font-medium">Hari</p>
@@ -124,7 +126,8 @@ export default function DashboardPage({ params }: { params: Promise<{ id: string
                       <span className="text-xs text-gray-300">-</span>
                     )}
                   </div>
-                </div>
+                  <Pencil className="w-3.5 h-3.5 text-gray-300 shrink-0" />
+                </button>
               );
             })}
           </div>
