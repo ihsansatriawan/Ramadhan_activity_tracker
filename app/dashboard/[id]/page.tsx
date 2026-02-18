@@ -106,7 +106,9 @@ export default function DashboardPage({ params }: { params: Promise<{ id: string
               if (!rec) return null;
               return (
                 <button
+                  type="button"
                   key={log.day}
+                  aria-label={`Edit catatan Hari ${log.day}`}
                   onClick={() => router.push(`/log/${id}?day=${log.day}`)}
                   className="w-full flex items-center gap-3 bg-white border border-green-100 rounded-xl p-3 shadow-sm
                              hover:border-emerald-300 hover:bg-emerald-50/50 active:scale-[0.98] transition-all duration-150 text-left"
@@ -126,7 +128,7 @@ export default function DashboardPage({ params }: { params: Promise<{ id: string
                       <span className="text-xs text-gray-300">-</span>
                     )}
                   </div>
-                  <Pencil className="w-3.5 h-3.5 text-gray-300 shrink-0" />
+                  <Pencil className="w-3.5 h-3.5 text-gray-300 shrink-0" aria-hidden="true" />
                 </button>
               );
             })}
