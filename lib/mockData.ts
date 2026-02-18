@@ -126,3 +126,13 @@ export function getUserStats(userId: string) {
 
   return { puasaPenuh, ngaji, olahraga, totalDays: historicalLogs.length };
 }
+
+const statusToOption: Record<PuasaStatus, PuasaOption> = {
+  full: "Puasa Penuh",
+  half: "Setengah Hari",
+  none: "Tidak Puasa",
+};
+
+export function puasaStatusToOption(status: PuasaStatus): PuasaOption {
+  return statusToOption[status];
+}
