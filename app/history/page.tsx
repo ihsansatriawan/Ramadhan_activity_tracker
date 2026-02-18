@@ -74,7 +74,7 @@ export default function HistoryPage() {
                                      hover:bg-emerald-50 transition-colors"
                           aria-label={`Edit catatan ${user.name} Hari ${log.day}`}
                         >
-                          <span className={`w-3 h-3 rounded-full ${puasaDot[rec.puasa]}`} />
+                          <span aria-hidden="true" className={`w-3 h-3 rounded-full ${puasaDot[rec.puasa]}`} />
                           {rec.ngaji && <BookOpen className="w-3.5 h-3.5 text-emerald-500" aria-hidden="true" />}
                           {rec.olahraga && <Activity className="w-3.5 h-3.5 text-blue-500" aria-hidden="true" />}
                         </Link>
