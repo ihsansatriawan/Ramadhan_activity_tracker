@@ -47,7 +47,7 @@ export interface HistoricalLog {
 
 export const historicalLogs: HistoricalLog[] = [
   {
-    day: 1, date: "2026-02-18",
+    day: 1, date: "2026-02-19",
     records: {
       ayah:   { puasa: "full", ngaji: true,  olahraga: true },
       ibu:    { puasa: "full", ngaji: true,  olahraga: false },
@@ -56,7 +56,7 @@ export const historicalLogs: HistoricalLog[] = [
     },
   },
   {
-    day: 2, date: "2026-02-19",
+    day: 2, date: "2026-02-20",
     records: {
       ayah:   { puasa: "full", ngaji: true,  olahraga: false },
       ibu:    { puasa: "full", ngaji: true,  olahraga: true },
@@ -65,7 +65,7 @@ export const historicalLogs: HistoricalLog[] = [
     },
   },
   {
-    day: 3, date: "2026-02-20",
+    day: 3, date: "2026-02-21",
     records: {
       ayah:   { puasa: "full", ngaji: false, olahraga: true },
       ibu:    { puasa: "full", ngaji: true,  olahraga: true },
@@ -74,7 +74,7 @@ export const historicalLogs: HistoricalLog[] = [
     },
   },
   {
-    day: 4, date: "2026-02-21",
+    day: 4, date: "2026-02-22",
     records: {
       ayah:   { puasa: "full", ngaji: true,  olahraga: true },
       ibu:    { puasa: "half", ngaji: true,  olahraga: false },
@@ -83,7 +83,7 @@ export const historicalLogs: HistoricalLog[] = [
     },
   },
   {
-    day: 5, date: "2026-02-22",
+    day: 5, date: "2026-02-23",
     records: {
       ayah:   { puasa: "full", ngaji: true,  olahraga: false },
       ibu:    { puasa: "full", ngaji: true,  olahraga: true },
@@ -92,7 +92,7 @@ export const historicalLogs: HistoricalLog[] = [
     },
   },
   {
-    day: 6, date: "2026-02-23",
+    day: 6, date: "2026-02-24",
     records: {
       ayah:   { puasa: "half", ngaji: true,  olahraga: true },
       ibu:    { puasa: "full", ngaji: true,  olahraga: false },
@@ -101,7 +101,7 @@ export const historicalLogs: HistoricalLog[] = [
     },
   },
   {
-    day: 7, date: "2026-02-24",
+    day: 7, date: "2026-02-25",
     records: {
       ayah:   { puasa: "full", ngaji: true,  olahraga: true },
       ibu:    { puasa: "full", ngaji: false, olahraga: true },
