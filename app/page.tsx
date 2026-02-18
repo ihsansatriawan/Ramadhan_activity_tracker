@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Moon, Trophy, Star, BookOpen, ChevronRight } from "lucide-react";
+import { Moon, Trophy, Star, BookOpen, ChevronRight, History } from "lucide-react";
 import { leaderboard, users } from "@/lib/mockData";
 
 const rankColors = [
@@ -89,6 +89,18 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* ── Riwayat Ramadhan Link ── */}
+        <Link
+          href="/history"
+          className="flex items-center gap-3 bg-white border border-green-100 rounded-2xl p-4 shadow-sm
+                     hover:border-emerald-400 hover:shadow-md hover:bg-emerald-50
+                     active:scale-[0.98] transition-all duration-150"
+        >
+          <History className="w-5 h-5 text-emerald-600" />
+          <span className="flex-1 font-semibold text-emerald-900">Riwayat Ramadhan</span>
+          <ChevronRight className="w-4 h-4 text-emerald-400" />
+        </Link>
+
         {/* ── Section 2: Isi Jurnal Hari Ini ── */}
         <section>
           <div className="flex items-center gap-2 mb-4">
@@ -100,7 +112,7 @@ export default function HomePage() {
             {users.map((user) => (
               <Link
                 key={user.id}
-                href={`/log/${user.id}`}
+                href={`/dashboard/${user.id}`}
                 className="group bg-white border border-green-100 rounded-2xl p-5 shadow-sm
                            flex flex-col items-center gap-3 text-center
                            hover:border-emerald-400 hover:shadow-md hover:bg-emerald-50
