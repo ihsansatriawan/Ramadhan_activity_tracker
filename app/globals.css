@@ -1,1 +1,45 @@
 @import "tailwindcss";
+
+@theme {
+  --color-bauhaus-red: #D03025;
+  --color-bauhaus-blue: #1C5BB8;
+  --color-bauhaus-yellow: #F7C924;
+  --color-bauhaus-black: #121212;
+  --color-bauhaus-white: #F0F0F0;
+  --color-bauhaus-green: #2E7D32;
+
+  --shadow-hard: 8px 8px 0px 0px #000000;
+  --shadow-hard-sm: 4px 4px 0px 0px #000000;
+  --shadow-hard-hover: 12px 12px 0px 0px #000000;
+  --shadow-hard-lg: 8px 8px 0px 0px rgba(18,18,18,1);
+}
+
+body {
+  background-color: #F0F0F0;
+  background-image: radial-gradient(#121212 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.material-symbols-outlined {
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 700,
+    'GRAD' 0,
+    'opsz' 48;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.triangle {
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-bottom: 20px solid #F7C924;
+}

@@ -2,56 +2,24 @@
 
 import { use, useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ArrowLeft, Moon, Utensils, BookOpen, Activity, CheckCircle2, Circle, Save } from "lucide-react";
 import { users, historicalLogs, puasaStatusToOption } from "@/lib/mockData";
 import type { PuasaOption } from "@/lib/mockData";
 
-const PUASA_OPTIONS: PuasaOption[] = ["Puasa Penuh", "Setengah Hari", "Tidak Puasa"];
+const PUASA_OPTIONS: { value: PuasaOption; label: string; selectedBg: string; selectedText: string }[] = [
+  { value: "Tidak Puasa", label: "Tidak", selectedBg: "bg-bauhaus-red", selectedText: "text-white" },
+  { value: "Setengah Hari", label: "Setengah", selectedBg: "bg-bauhaus-yellow", selectedText: "text-black" },
+  { value: "Puasa Penuh", label: "Penuh", selectedBg: "bg-bauhaus-blue", selectedText: "text-white" },
+];
 
-const puasaStyles: Record<PuasaOption, string> = {
-  "Puasa Penuh":   "border-emerald-500 bg-emerald-50 text-emerald-800",
-  "Setengah Hari": "border-yellow-400 bg-yellow-50 text-yellow-800",
-  "Tidak Puasa":   "border-red-300 bg-red-50 text-red-700",
-};
-
-interface ToggleRowProps {
-  label: string;
-  sublabel: string;
-  icon: React.ReactNode;
-  checked: boolean;
-  onChange: (val: boolean) => void;
+function getDayName(dateStr: string): string {
+  const days = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+  const d = new Date(dateStr + "T00:00:00");
+  return days[d.getDay()];
 }
 
-function ToggleRow({ label, sublabel, icon, checked, onChange }: ToggleRowProps) {
-  return (
-    <button
-      type="button"
-      onClick={() => onChange(!checked)}
-      className={`w-full flex items-center gap-4 p-4 rounded-2xl border-2 text-left transition-all duration-150
-        ${checked
-          ? "border-emerald-500 bg-emerald-50"
-          : "border-gray-200 bg-white hover:border-emerald-200 hover:bg-emerald-50/40"
-        }`}
-    >
-      <span className={`shrink-0 ${checked ? "text-emerald-600" : "text-gray-400"}`}>
-        {icon}
-      </span>
-      <div className="flex-1">
-        <p className={`font-semibold text-sm ${checked ? "text-emerald-900" : "text-gray-700"}`}>
-          {label}
-        </p>
-        <p className={`text-xs mt-0.5 ${checked ? "text-emerald-600" : "text-gray-400"}`}>
-          {checked ? "Sudah dilakukan" : sublabel}
-        </p>
-      </div>
-      <span className={`shrink-0 transition-colors ${checked ? "text-emerald-500" : "text-gray-300"}`}>
-        {checked
-          ? <CheckCircle2 className="w-6 h-6 fill-emerald-100" />
-          : <Circle className="w-6 h-6" />
-        }
-      </span>
-    </button>
-  );
+function formatDate(dateStr: string): string {
+  const d = new Date(dateStr + "T00:00:00");
+  return d.toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" });
 }
 
 export default function LogPage({ params }: { params: Promise<{ id: string }> }) {
@@ -63,10 +31,11 @@ export default function LogPage({ params }: { params: Promise<{ id: string }> })
   const dayParam = searchParams.get("day");
   const editDay = dayParam ? Number(dayParam) : null;
 
-  // Look up historical record for edit mode
-  const editRecord = editDay
-    ? historicalLogs.find((l) => l.day === editDay)?.records[id]
-    : null;
+  const editLog = editDay ? historicalLogs.find((l) => l.day === editDay) : null;
+  const editRecord = editLog?.records[id] ?? null;
+
+  const currentDay = editDay ?? historicalLogs.length + 1;
+  const currentDate = editLog?.date ?? new Date().toISOString().split("T")[0];
 
   const [puasa, setPuasa] = useState<PuasaOption>(
     editRecord ? puasaStatusToOption(editRecord.puasa) : "Puasa Penuh"
@@ -90,17 +59,17 @@ export default function LogPage({ params }: { params: Promise<{ id: string }> })
 
   if (!user) {
     return (
-      <main className="min-h-screen bg-green-50 flex items-center justify-center">
-        <div className="text-center p-8">
-          <p className="text-gray-500 text-lg">Anggota keluarga tidak ditemukan.</p>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center p-8 border-4 border-black bg-white shadow-hard">
+          <p className="text-lg font-bold uppercase">Anggota keluarga tidak ditemukan.</p>
           <button
             onClick={() => router.push("/")}
-            className="mt-4 text-emerald-600 font-semibold underline"
+            className="mt-4 bg-bauhaus-blue text-white font-bold px-4 py-2 border-2 border-black"
           >
-            Kembali ke beranda
+            Kembali
           </button>
         </div>
-      </main>
+      </div>
     );
   }
 
@@ -112,136 +81,137 @@ export default function LogPage({ params }: { params: Promise<{ id: string }> })
   }
 
   return (
-    <main className="min-h-screen bg-green-50">
-      {/* ── Header ── */}
-      <header className="bg-emerald-700 text-white py-5 px-4 shadow-lg">
-        <div className="max-w-md mx-auto flex items-center gap-3">
-          <button
-            onClick={() => router.back()}
-            aria-label={editDay ? "Kembali ke halaman sebelumnya" : "Kembali ke beranda"}
-            className="p-2 rounded-xl hover:bg-emerald-600 active:bg-emerald-800 transition-colors"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </button>
-          <Moon className="w-6 h-6 text-yellow-300 fill-yellow-300" />
-          <div>
-            <h1 className="text-lg font-bold leading-tight">
-              {editDay ? `Edit Hari ${editDay}` : "Jurnal Harian"}
+    <div className="flex items-center justify-center min-h-screen p-0 sm:p-4 font-[family-name:var(--font-inter)] text-bauhaus-black">
+      <main className="w-full max-w-md bg-white border-4 border-black shadow-hard relative z-10 min-h-screen sm:min-h-0 sm:h-[850px] flex flex-col">
+        {/* Header */}
+        <header className="bg-white border-b-4 border-black px-6 py-6 flex flex-col justify-end min-h-[140px] relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-full bg-bauhaus-red skew-x-12 translate-x-10 z-0 border-l-4 border-black" />
+          <div className="relative z-10">
+            <div className="flex items-center justify-between mb-2">
+              <button
+                onClick={() => router.back()}
+                aria-label="Kembali"
+                className="w-10 h-10 flex items-center justify-center border-2 border-black bg-white hover:bg-black hover:text-white transition-colors"
+              >
+                <span className="material-symbols-outlined font-bold">arrow_back</span>
+              </button>
+              <span className="font-mono text-xs uppercase tracking-widest border border-black px-2 py-1 bg-bauhaus-yellow">
+                Ramadhan Day {currentDay}
+              </span>
+            </div>
+            <h1 className="text-7xl font-[family-name:var(--font-outfit)] font-black leading-none tracking-tighter mt-2">
+              LOG
             </h1>
-            <p className="text-emerald-200 text-sm">{user.name} {user.avatar}</p>
+          </div>
+        </header>
+
+        {/* Scrollable Content */}
+        <div className="flex-1 overflow-y-auto no-scrollbar">
+          {/* Day Info Bar */}
+          <div className="px-6 py-6 border-b-4 border-black bg-white flex justify-between items-end">
+            <div>
+              <h2 className="text-2xl font-bold uppercase tracking-tight">{getDayName(currentDate)}</h2>
+              <p className="font-mono text-sm text-gray-600">{formatDate(currentDate)}</p>
+            </div>
+            <div className="w-12 h-12 bg-black rounded-full" />
+          </div>
+
+          {/* Status Puasa */}
+          <div className="px-6 py-8">
+            <h3 className="font-[family-name:var(--font-outfit)] font-black text-xl mb-6 uppercase border-l-8 border-bauhaus-blue pl-3 leading-none">
+              Status Puasa
+            </h3>
+            <div className="grid grid-cols-3 gap-4">
+              {PUASA_OPTIONS.map((option) => {
+                const isSelected = puasa === option.value;
+                return (
+                  <label key={option.value} className="cursor-pointer group relative">
+                    <input
+                      type="radio"
+                      name="fasting_status"
+                      className="peer sr-only"
+                      checked={isSelected}
+                      onChange={() => setPuasa(option.value)}
+                    />
+                    <div className={`aspect-square border-4 border-black flex flex-col items-center justify-center gap-2 transition-all
+                      ${isSelected ? `${option.selectedBg} ${option.selectedText} shadow-hard-sm` : "bg-white group-hover:translate-x-1 group-hover:translate-y-1"}`}
+                    >
+                      <div className="w-8 h-8 border-2 border-black rounded-full flex items-center justify-center bg-white">
+                        {isSelected && <div className="w-3 h-3 rounded-full bg-current" />}
+                      </div>
+                      <span className="font-bold text-sm uppercase">{option.label}</span>
+                    </div>
+                  </label>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Divider */}
+          <div className="h-4 border-y-4 border-black" />
+
+          {/* Rutinitas */}
+          <div className="px-6 py-8 space-y-8 bg-white">
+            <h3 className="font-[family-name:var(--font-outfit)] font-black text-xl mb-6 uppercase border-l-8 border-bauhaus-red pl-3 leading-none">
+              Rutinitas
+            </h3>
+
+            {/* Ngaji Toggle */}
+            <div className="flex items-center justify-between">
+              <div>
+                <h4 className="font-bold text-lg uppercase">Ngaji</h4>
+                <p className="text-xs font-mono bg-black text-white px-1 inline-block mt-1">READING</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setNgaji(!ngaji)}
+                className={`relative w-24 h-12 border-4 border-black rounded-full overflow-hidden transition-colors ${ngaji ? "bg-bauhaus-yellow" : "bg-gray-200"}`}
+                aria-label={`Ngaji: ${ngaji ? "aktif" : "nonaktif"}`}
+              >
+                <div className={`absolute top-0.5 w-10 h-10 bg-white border-4 border-black rounded-full transition-all flex items-center justify-center shadow-sm ${ngaji ? "left-12" : "left-0.5"}`}>
+                  <div className="w-2 h-2 bg-black rounded-full" />
+                </div>
+              </button>
+            </div>
+
+            {/* Olahraga Toggle */}
+            <div className="flex items-center justify-between">
+              <div>
+                <h4 className="font-bold text-lg uppercase">Olahraga</h4>
+                <p className="text-xs font-mono bg-black text-white px-1 inline-block mt-1">SPORT</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setOlahraga(!olahraga)}
+                className={`relative w-24 h-12 border-4 border-black rounded-full overflow-hidden transition-colors ${olahraga ? "bg-bauhaus-blue" : "bg-gray-200"}`}
+                aria-label={`Olahraga: ${olahraga ? "aktif" : "nonaktif"}`}
+              >
+                <div className={`absolute top-0.5 w-10 h-10 bg-white border-4 border-black rounded-full transition-all flex items-center justify-center shadow-sm ${olahraga ? "left-12" : "left-0.5"}`}>
+                  <div className="w-2 h-2 bg-black rounded-full" />
+                </div>
+              </button>
+            </div>
           </div>
         </div>
-      </header>
 
-      <div className="max-w-md mx-auto px-4 py-6 space-y-6">
-
-        {/* ── Puasa Section ── */}
-        <section className="bg-white rounded-2xl shadow-sm border border-green-100 p-5">
-          <div className="flex items-center gap-2 mb-4">
-            <Utensils className="w-5 h-5 text-emerald-600" />
-            <h2 className="font-bold text-emerald-900">Status Puasa</h2>
-          </div>
-
-          <div className="flex flex-col gap-2">
-            {PUASA_OPTIONS.map((option) => {
-              const isSelected = puasa === option;
-              return (
-                <label
-                  key={option}
-                  className={`flex items-center gap-3 p-3.5 rounded-xl border-2 cursor-pointer transition-all duration-150
-                    ${isSelected ? puasaStyles[option] : "border-gray-200 bg-gray-50 text-gray-600 hover:border-gray-300"}`}
-                >
-                  <input
-                    type="radio"
-                    name="puasa"
-                    value={option}
-                    checked={isSelected}
-                    onChange={() => setPuasa(option)}
-                    className="sr-only"
-                  />
-                  <span className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0
-                    ${isSelected ? "border-current" : "border-gray-300"}`}
-                  >
-                    {isSelected && (
-                      <span className="w-2 h-2 rounded-full bg-current" />
-                    )}
-                  </span>
-                  <span className="font-medium text-sm">{option}</span>
-                </label>
-              );
-            })}
-          </div>
-        </section>
-
-        {/* ── Ngaji & Olahraga Toggles ── */}
-        <section className="space-y-3">
-          <ToggleRow
-            label="Ngaji"
-            sublabel="Belum membaca Al-Qur'an hari ini"
-            icon={<BookOpen className="w-6 h-6" />}
-            checked={ngaji}
-            onChange={setNgaji}
-          />
-          <ToggleRow
-            label="Olahraga"
-            sublabel="Belum berolahraga hari ini"
-            icon={<Activity className="w-6 h-6" />}
-            checked={olahraga}
-            onChange={setOlahraga}
-          />
-        </section>
-
-        {/* ── Summary Card ── */}
-        <section className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4">
-          <p className="text-xs font-semibold text-emerald-700 uppercase tracking-wide mb-3">
-            Ringkasan Hari Ini
-          </p>
-          <div className="grid grid-cols-3 gap-2 text-center">
-            <div className="bg-white rounded-xl p-3 shadow-sm">
-              <p className="text-xl mb-1">🌙</p>
-              <p className="text-[11px] font-medium text-gray-500">Puasa</p>
-              <p className="text-xs font-bold text-emerald-700 mt-0.5 leading-tight">{puasa}</p>
+        {/* Save Button (sticky bottom) */}
+        <div className="p-4 bg-white border-t-4 border-black z-20">
+          {saved ? (
+            <div className="w-full py-4 bg-bauhaus-green border-4 border-black text-white font-[family-name:var(--font-outfit)] font-black text-xl uppercase tracking-widest flex items-center justify-center gap-3">
+              <span className="material-symbols-outlined text-3xl">check_circle</span>
+              Tersimpan!
             </div>
-            <div className="bg-white rounded-xl p-3 shadow-sm">
-              <p className="text-xl mb-1">{ngaji ? "📖" : "📕"}</p>
-              <p className="text-[11px] font-medium text-gray-500">Ngaji</p>
-              <p className={`text-xs font-bold mt-0.5 ${ngaji ? "text-emerald-700" : "text-gray-400"}`}>
-                {ngaji ? "Sudah" : "Belum"}
-              </p>
-            </div>
-            <div className="bg-white rounded-xl p-3 shadow-sm">
-              <p className="text-xl mb-1">{olahraga ? "🏃" : "🛋️"}</p>
-              <p className="text-[11px] font-medium text-gray-500">Olahraga</p>
-              <p className={`text-xs font-bold mt-0.5 ${olahraga ? "text-emerald-700" : "text-gray-400"}`}>
-                {olahraga ? "Sudah" : "Belum"}
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* ── Save Button / Success State ── */}
-        {saved ? (
-          <div className="flex items-center justify-center gap-3 bg-emerald-600 text-white rounded-2xl py-4 shadow-lg">
-            <CheckCircle2 className="w-6 h-6 fill-white text-emerald-600" />
-            <span className="font-bold text-lg">{editDay ? "Perubahan Tersimpan!" : "Jurnal Tersimpan!"}</span>
-          </div>
-        ) : (
-          <button
-            onClick={handleSimpan}
-            className="w-full flex items-center justify-center gap-2
-                       bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800
-                       text-white font-bold text-base py-4 rounded-2xl shadow-lg
-                       transition-all duration-150 active:scale-95"
-          >
-            <Save className="w-5 h-5" />
-            {editDay ? "Simpan Perubahan" : "Simpan Jurnal"}
-          </button>
-        )}
-
-        <p className="text-center text-xs text-emerald-400 pb-2">
-          Jazakallahu khairan atas ibadahmu hari ini ✨
-        </p>
-      </div>
-    </main>
+          ) : (
+            <button
+              onClick={handleSimpan}
+              className="w-full py-4 bg-bauhaus-yellow border-4 border-black text-black font-[family-name:var(--font-outfit)] font-black text-xl uppercase tracking-widest hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] shadow-hard hover:shadow-hard-sm active:shadow-none transition-all flex items-center justify-center gap-3"
+            >
+              <span>Simpan</span>
+              <span className="material-symbols-outlined text-[28px]">save</span>
+            </button>
+          )}
+        </div>
+      </main>
+    </div>
   );
 }
